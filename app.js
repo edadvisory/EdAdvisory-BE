@@ -10,19 +10,25 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+// CORS configuration to only allow requests from your frontend domain
+const corsOptions = {
+  origin: 'https://edadvisory.co',  // Your frontend domain
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+};
+
 // Middleware
-app.use(cors());
+app.use(cors(corsOptions));  // Use the customized CORS settings
 app.use(bodyParser.json());
 
 // Routes
 app.use('/api', routes);
 
 app.get('/test', (req, res) => {
-    res.send('Backend is working!');
-  });
-
+  res.send('Backend is working!');
+});
 
 // Start server
 app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
+  console.log(`Server is running on http://localhost:${PORT}`);
 });
