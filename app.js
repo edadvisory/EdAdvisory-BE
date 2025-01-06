@@ -17,6 +17,11 @@ app.use(bodyParser.json());
 // Routes
 app.use('/api', routes);
 
+app.get('/test', (req, res) => {
+    res.send('Backend is working!');
+  });
+
+
 // Start server
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
