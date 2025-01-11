@@ -19,6 +19,7 @@ const corsOptions = {
 
 // Middleware
 app.use(cors(corsOptions));  // Use the customized CORS settings
+// app.use(cors());  // Allow requests from all origins
 app.use(bodyParser.json());
 
 // Routes

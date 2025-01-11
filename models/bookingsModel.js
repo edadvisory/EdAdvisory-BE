@@ -1,9 +1,13 @@
 const pool = require('../config/db');
 
 // Create a new booking
-const createBooking = async (first_name, last_name, email, phone_no) => {
+const createBooking = async (firstName, lastName, email, phoneNo) => {
+  
+  // If lastName is null or undefined, set it to null in the query
+  const lastNameToInsert = (lastName === null || lastName === undefined) ? null : lastName;
+
   const query = 'INSERT INTO bookings(first_name, last_name, email, phone_no) VALUES($1, $2, $3, $4) RETURNING *';
-  const values = [first_name, last_name, email, phone_no];
+  const values = [firstName, lastNameToInsert, email, phoneNo];
   return pool.query(query, values);
 };
 

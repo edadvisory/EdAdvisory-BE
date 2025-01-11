@@ -48,12 +48,14 @@ const sendEmail = async (firstName, lastName, email, message) => {
     },
   });
 
+  const name = (lastName && lastName.trim()) ? `${firstName} ${lastName}` : firstName;
+
   // Email options
   const mailOptions = {
     from: email,  // Sender's email address
     to: process.env.ADMIN_EMAIL,  // Receiver's email address (Admin's email)
-    subject: `Ed Advisory - Contact Form Submission By ${firstName} ${lastName}`,
-    text: `You have a new contact form submission:\n\nName: ${firstName} ${lastName}\n\nEmail: ${email}\n\nMessage:\n\n${message}`,
+    subject: `Ed Advisory - Contact Form Submission By ${name}`,
+    text: `You have a new contact form submission:\n\nName: ${name}\n\nEmail: ${email}\n\nMessage:\n\n${message}`,
   };
 
   try {
