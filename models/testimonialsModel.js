@@ -9,7 +9,7 @@ const createTestimonial = async (name, institute, program, message) => {
 
 // Get all testimonials
 const getAllTestimonials = async () => {
-  const query = 'SELECT * FROM testimonials';
+  const query = 'SELECT * FROM testimonials ORDER BY id';
   return pool.query(query);
 };
 
