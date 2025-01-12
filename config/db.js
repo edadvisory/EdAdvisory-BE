@@ -5,12 +5,17 @@ const dotenv = require('dotenv');
 dotenv.config();
 
 // Create a PostgreSQL connection pool
+// const pool = new Pool({
+//     user: process.env.PG_USER,         // Database username
+//     host: process.env.PG_HOST,         // Database host
+//     database: process.env.PG_DATABASE, // Database name
+//     password: process.env.PG_PASSWORD, // Database password
+//     port: process.env.PG_PORT,         // Database port (default is 5432)
+// });
+
+// Create a PostgreSQL connection pool
 const pool = new Pool({
-    user: process.env.PG_USER,         // Database username
-    host: process.env.PG_HOST,         // Database host
-    database: process.env.PG_DATABASE, // Database name
-    password: process.env.PG_PASSWORD, // Database password
-    port: process.env.PG_PORT,         // Database port (default is 5432)
+    connectionString: process.env.DATABASE_URL
 });
 
 // const connectDB = async () => {
