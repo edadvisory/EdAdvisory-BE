@@ -1,9 +1,11 @@
 const pool = require('../config/db');
 
 // Create a new testimonial
-const createTestimonial = async (name, institute, program, message) => {
-  const query = 'INSERT INTO testimonials(name, institute, program, message) VALUES($1, $2, $3, $4) RETURNING *';
-  const values = [name, institute, program, message];
+const createTestimonial = async (rating, name, serviceTaken, message, profilePicture) => {
+  const query = `
+      INSERT INTO testimonials (rating, name, service_taken, message, profile_picture) 
+      VALUES($1, $2, $3, $4, $5) RETURNING *`;
+  const values = [rating, name, serviceTaken, message, profilePicture];
   return pool.query(query, values);
 };
 

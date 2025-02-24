@@ -21,6 +21,7 @@ const corsOptions = {
 app.use(cors(corsOptions));  // Use the customized CORS settings
 // app.use(cors());  // Allow requests from all origins
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true })); // Handle form data
 
 // Routes
 app.use('/api', routes);

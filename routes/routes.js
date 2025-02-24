@@ -6,7 +6,7 @@ const bookingsController = require('../controllers/bookingsController');
 const contactController = require('../controllers/contactController');
 
 // Testimonials routes
-router.post('/testimonials', testimonialsController.createTestimonial);
+router.post('/testimonials', testimonialsController.upload.single('profilePicture'), testimonialsController.createTestimonial);
 router.get('/testimonials', testimonialsController.getAllTestimonials);
 
 // Bookings routes
