@@ -2,7 +2,7 @@ const pool = require('../config/db');
 
 const getAllBlogs = async () => {
   const query = `
-    SELECT id, title, author, publish_date, content
+    SELECT id, title, author, publish_date
     FROM blogs
     ORDER BY publish_date DESC, id DESC
   `;
