@@ -1,19 +1,27 @@
 const nodemailer = require('nodemailer');
-const dotenv = require('dotenv');
 
-dotenv.config();
+const transporter = nodemailer.createTransport({
+  host: 'smtpout.secureserver.net',
+  port: 465,
+  secure: true,
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+  },
+  connectionTimeout: 15000,
+  greetingTimeout: 15000,
+  socketTimeout: 20000,
+});
+
+transporter.verify((error) => {
+  if (error) {
+    console.error('BLOG SMTP VERIFY ERROR:', error);
+  } else {
+    console.log('BLOG SMTP VERIFY OK');
+  }
+});
 
 const sendBlogCommentEmail = async ({ blogId, blogTitle, pageUrl, comment }) => {
-  const transporter = nodemailer.createTransport({
-    host: 'smtpout.secureserver.net',
-    port: 465,
-    secure: true,
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS,
-    },
-  });
-
   const mailOptions = {
     from: process.env.EMAIL_USER,
     to: process.env.ADMIN_EMAIL,
