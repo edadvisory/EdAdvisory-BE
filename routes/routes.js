@@ -19,7 +19,7 @@ router.get('/bookings', bookingsController.getAllBookings);
 router.get('/blogs', blogsController.getBlogs);
 router.get('/blogs/:id', blogsController.getBlog);
 
-//blog-comments route
+// Blog comments route
 router.post('/blogs/:id/comments', blogCommentsController.submitComment);
 
 // Handle contact form submission
