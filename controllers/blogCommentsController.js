@@ -11,6 +11,14 @@ const transporter = nodemailer.createTransport({
   },
 });
 
+transporter.verify((error) => {
+  if (error) {
+    console.error('SMTP ERROR:', error);
+  } else {
+    console.log('SMTP ready');
+  }
+});
+
 function escapeHtml(str = '') {
   return str
     .replace(/&/g, '&amp;')
@@ -33,12 +41,6 @@ const submitComment = async (req, res) => {
       return res.status(400).json({ error: 'Comment is required.' });
     }
 
-    const trimmedComment = comment.trim();
-
-    if (trimmedComment.length > 3000) {
-      return res.status(400).json({ error: 'Comment is too long.' });
-    }
-
     const blogResult = await blogsModel.getBlogById(id);
 
     if (!blogResult.rows.length) {
@@ -47,46 +49,50 @@ const submitComment = async (req, res) => {
 
     const blog = blogResult.rows[0];
 
-    // For testing, if COMMENT_RECEIVER is set, use it.
-    // Later you can change it to ADMIN_EMAIL in .env only.
-    const receiverEmail = process.env.COMMENT_RECEIVER || process.env.ADMIN_EMAIL;
-
-    if (!receiverEmail) {
-      return res.status(500).json({ error: 'Comment receiver email is not configured.' });
+    if (!process.env.ADMIN_EMAIL) {
+      return res.status(500).json({
+        error: 'Admin email not configured.',
+      });
     }
 
-    const mailOptions = {
-      from: process.env.EMAIL_USER,
-      to: receiverEmail,
-      subject: `Test Blog Comment - ${blog.title || `Blog #${id}`}`,
+    const info = await transporter.sendMail({
+      from: `"Ed Advisory Website" <${process.env.EMAIL_USER}>`,
+      to: process.env.ADMIN_EMAIL,
+      replyTo: process.env.EMAIL_USER,
+      subject: `New Blog Comment - ${blog.title}`,
+      text: `
+New Blog Comment
+
+Blog: ${blog.title}
+Blog ID: ${blog.id}
+URL: ${pageUrl || 'N/A'}
+
+Comment:
+${comment}
+      `,
       html: `
-        <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #222;">
-          <h2>New Blog Comment Received</h2>
-          <p><strong>Blog ID:</strong> ${escapeHtml(String(blog.id))}</p>
-          <p><strong>Blog Title:</strong> ${escapeHtml(blog.title || '')}</p>
-          <p><strong>Author:</strong> ${escapeHtml(blog.author || 'N/A')}</p>
-          <p><strong>Publish Date:</strong> ${escapeHtml(blog.publish_date ? new Date(blog.publish_date).toISOString() : 'N/A')}</p>
-          ${
-            pageUrl
-              ? `<p><strong>Page URL:</strong> ${escapeHtml(pageUrl)}</p>`
-              : ''
-          }
+        <div style="font-family: Arial;">
+          <h2>New Blog Comment</h2>
+          <p><strong>Blog:</strong> ${escapeHtml(blog.title)}</p>
+          <p><strong>Blog ID:</strong> ${blog.id}</p>
+          ${pageUrl ? `<p><strong>URL:</strong> ${escapeHtml(pageUrl)}</p>` : ''}
           <hr />
           <p><strong>Comment:</strong></p>
-          <div style="white-space: pre-wrap; border: 1px solid #ddd; padding: 12px; border-radius: 8px; background: #f9f9f9;">
-            ${escapeHtml(trimmedComment)}
+          <div style="background:#f5f5f5; padding:10px; border-radius:8px;">
+            ${escapeHtml(comment)}
           </div>
         </div>
       `,
-    };
+    });
 
-    await transporter.sendMail(mailOptions);
+    console.log('Email sent:', info.messageId);
 
     return res.status(200).json({
-      message: 'Your comment has been submitted successfully.',
+      message: 'Comment submitted successfully.',
     });
   } catch (error) {
-    console.error('Error submitting blog comment:', error);
+    console.error('COMMENT ERROR:', error);
+
     return res.status(500).json({
       error: 'Failed to submit comment. Please try again later.',
     });
