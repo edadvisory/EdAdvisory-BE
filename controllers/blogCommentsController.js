@@ -8,19 +8,19 @@ const submitComment = async (req, res) => {
       return res.status(400).json({ error: 'Blog ID is required.' });
     }
 
-    if (!blogTitle || !blogTitle.trim()) {
+    if (!blogTitle || !String(blogTitle).trim()) {
       return res.status(400).json({ error: 'Blog title is required.' });
     }
 
-    if (!comment || !comment.trim()) {
+    if (!comment || !String(comment).trim()) {
       return res.status(400).json({ error: 'Comment is required.' });
     }
 
     await sendBlogCommentEmail({
       blogId: String(blogId).trim(),
-      blogTitle: blogTitle.trim(),
-      pageUrl: pageUrl ? pageUrl.trim() : '',
-      comment: comment.trim(),
+      blogTitle: String(blogTitle).trim(),
+      pageUrl: pageUrl ? String(pageUrl).trim() : '',
+      comment: String(comment).trim(),
     });
 
     return res.status(200).json({
