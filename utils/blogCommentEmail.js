@@ -18,6 +18,10 @@ const transporter = nodemailer.createTransport({
 });
 
 const sendBlogCommentEmail = async ({ blogId, blogTitle, pageUrl, comment }) => {
+  if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS || !process.env.ADMIN_EMAIL) {
+    throw new Error('Missing email environment variables.');
+  }
+
   const mailOptions = {
     from: process.env.EMAIL_USER,
     to: process.env.ADMIN_EMAIL,
@@ -46,12 +50,7 @@ ${comment}
     `,
   };
 
-  try {
-    await transporter.sendMail(mailOptions);
-  } catch (error) {
-    console.error('Error sending blog comment email:', error);
-    throw new Error('Failed to send blog comment email');
-  }
+  await transporter.sendMail(mailOptions);
 };
 
 module.exports = sendBlogCommentEmail;
