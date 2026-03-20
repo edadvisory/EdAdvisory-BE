@@ -1,37 +1,27 @@
-const blogsModel = require('../models/blogsModel');
 const sendBlogCommentEmail = require('../utils/blogCommentEmail');
 
 const submitComment = async (req, res) => {
-  const { id } = req.params;
-  const { comment, pageUrl } = req.body;
+  const { blogId, blogTitle, pageUrl, comment } = req.body;
 
   try {
-    if (!id) {
+    if (!blogId || !String(blogId).trim()) {
       return res.status(400).json({ error: 'Blog ID is required.' });
+    }
+
+    if (!blogTitle || !blogTitle.trim()) {
+      return res.status(400).json({ error: 'Blog title is required.' });
     }
 
     if (!comment || !comment.trim()) {
       return res.status(400).json({ error: 'Comment is required.' });
     }
 
-    const trimmedComment = comment.trim();
-
-    const blogResult = await blogsModel.getBlogById(id);
-
-    if (!blogResult.rows.length) {
-      return res.status(404).json({ error: 'Blog not found.' });
-    }
-
-    const blog = blogResult.rows[0];
-
     await sendBlogCommentEmail({
-      blogId: blog.id,
-      blogTitle: blog.title,
-      pageUrl,
-      comment: trimmedComment,
+      blogId: String(blogId).trim(),
+      blogTitle: blogTitle.trim(),
+      pageUrl: pageUrl ? pageUrl.trim() : '',
+      comment: comment.trim(),
     });
-
-    console.log('Blog comment submitted. Email sent successfully to admin.');
 
     return res.status(200).json({
       message: 'Comment submitted successfully.',
