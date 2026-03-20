@@ -19,9 +19,17 @@ const transporter = nodemailer.createTransport({
   tls: {
     rejectUnauthorized: false,
   },
-  lookup(hostname, options, callback) {
-    console.log(`Custom DNS lookup called for: ${hostname}`);
-    return dns.lookup(hostname, { family: 4, all: false }, callback);
+  getSocket: (options, callback) => {
+    dns.lookup(options.host, { family: 4 }, (err, address) => {
+      if (err) {
+        return callback(err);
+      }
+
+      console.log(`Resolved ${options.host} to IPv4: ${address}`);
+
+      options.host = address;
+      callback(null, false);
+    });
   },
 });
 
