@@ -1,45 +1,17 @@
-const nodemailer = require('nodemailer');
+const { Resend } = require('resend');
 const dotenv = require('dotenv');
-const dns = require('dns');
 
 dotenv.config();
 
-const transporter = nodemailer.createTransport({
-  host: 'smtp.gmail.com',
-  port: 587,
-  secure: false,
-  requireTLS: true,
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-  connectionTimeout: 15000,
-  greetingTimeout: 15000,
-  socketTimeout: 20000,
-  tls: {
-    rejectUnauthorized: false,
-  },
-  getSocket: (options, callback) => {
-    dns.lookup(options.host, { family: 4 }, (err, address) => {
-      if (err) {
-        return callback(err);
-      }
-
-      console.log(`Resolved ${options.host} to IPv4: ${address}`);
-
-      options.host = address;
-      callback(null, false);
-    });
-  },
-});
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 const sendBlogCommentEmail = async ({ blogId, blogTitle, pageUrl, comment }) => {
-  if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS || !process.env.ADMIN_EMAIL) {
+  if (!process.env.RESEND_API_KEY || !process.env.ADMIN_EMAIL) {
     throw new Error('Missing email environment variables.');
   }
 
-  const mailOptions = {
-    from: process.env.EMAIL_USER,
+  const { error } = await resend.emails.send({
+    from: 'Ed Advisory <onboarding@resend.dev>',
     to: process.env.ADMIN_EMAIL,
     subject: `Ed Advisory - New Blog Comment on "${blogTitle}"`,
     text: `You have received a new blog comment.
@@ -64,12 +36,10 @@ ${comment}
         </div>
       </div>
     `,
-  };
+  });
 
-  try {
-    await transporter.sendMail(mailOptions);
-  } catch (error) {
-    console.error('Error sending blog comment email:', error);
+  if (error) {
+    console.error('Error sending blog comment email via Resend:', error);
     throw new Error('Failed to send blog comment email');
   }
 };
