@@ -1,5 +1,6 @@
 const nodemailer = require('nodemailer');
 const dotenv = require('dotenv');
+const dns = require('dns');
 
 dotenv.config();
 
@@ -17,6 +18,10 @@ const transporter = nodemailer.createTransport({
   socketTimeout: 20000,
   tls: {
     rejectUnauthorized: false,
+  },
+  dnsTimeout: 10000,
+  lookup(hostname, options, callback) {
+    return dns.lookup(hostname, { family: 4, all: false }, callback);
   },
 });
 
