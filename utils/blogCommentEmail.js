@@ -5,8 +5,8 @@ dotenv.config();
 
 const transporter = nodemailer.createTransport({
   host: 'smtp.gmail.com',
-  port: 465,
-  secure: true,
+  port: 587,
+  secure: false,
   requireTLS: true,
   auth: {
     user: process.env.EMAIL_USER,
@@ -15,6 +15,9 @@ const transporter = nodemailer.createTransport({
   connectionTimeout: 15000,
   greetingTimeout: 15000,
   socketTimeout: 20000,
+  tls: {
+    rejectUnauthorized: false,
+  },
 });
 
 const sendBlogCommentEmail = async ({ blogId, blogTitle, pageUrl, comment }) => {
@@ -50,7 +53,12 @@ ${comment}
     `,
   };
 
-  await transporter.sendMail(mailOptions);
+  try {
+    await transporter.sendMail(mailOptions);
+  } catch (error) {
+    console.error('Error sending blog comment email:', error);
+    throw new Error('Failed to send blog comment email');
+  }
 };
 
 module.exports = sendBlogCommentEmail;
