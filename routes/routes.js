@@ -20,7 +20,7 @@ router.get('/blogs', blogsController.getBlogs);
 router.get('/blogs/:id', blogsController.getBlog);
 
 // Blog comments route
-router.post('/blogs/:id/comments', blogCommentsController.submitComment);
+router.post('/blogs/comments', blogCommentsController.submitComment);
 
 // Handle contact form submission
 router.post('/contact', contactController.handleContactForm);
