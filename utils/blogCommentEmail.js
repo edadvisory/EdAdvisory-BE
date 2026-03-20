@@ -19,8 +19,8 @@ const transporter = nodemailer.createTransport({
   tls: {
     rejectUnauthorized: false,
   },
-  dnsTimeout: 10000,
   lookup(hostname, options, callback) {
+    console.log(`Custom DNS lookup called for: ${hostname}`);
     return dns.lookup(hostname, { family: 4, all: false }, callback);
   },
 });
